@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('Clone Repo') {
             steps {
-                git 'https://github.com/Gowthamps2003/Trend.git'
+                git branch: 'main', url: 'https://github.com/Gowthamps2003/Trend.git'
             }
         }
 
@@ -16,19 +16,13 @@ pipeline {
 
         stage('Push to DockerHub') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'dockerhub-creds',
-                usernameVariable: 'USER', passwordVariable: 'PASS')]) {
-                    sh '''
-                    docker login -u $USER -p $PASS
-                    docker push gowthamps2003/trend-app:latest
-                    '''
-                }
+                sh 'docker push gowthamps2003/trend-app:latest'
             }
         }
 
         stage('Deploy to EKS') {
             steps {
-                sh 'kubectl apply -f k8s/'
+                sh 'kubectl rollout restart deployment trend-app'
             }
         }
     }
