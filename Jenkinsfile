@@ -3,9 +3,15 @@ pipeline {
 
     stages {
 
+        stage('Clone Repo') {
+            steps {
+                git branch: 'main', url: 'https://github.com/Gowthamps2003/Trend.git'
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t gowthamps2003/trend-app:latest .'
+                sh 'docker build -t gowthamps03/trend-app:latest .'
             }
         }
 
@@ -18,8 +24,10 @@ pipeline {
                         passwordVariable: 'DOCKER_PASS'
                     )
                 ]) {
-                    sh 'docker login -u $DOCKER_USER -p $DOCKER_PASS'
-                    sh 'docker push gowthamps2003/trend-app:latest'
+                    sh '''
+                      echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+                      docker push gowthamps03/trend-app:latest
+                    '''
                 }
             }
         }
